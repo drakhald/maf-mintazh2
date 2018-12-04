@@ -52,13 +52,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void productWithProgress(View view) {
+        int num1 = Integer.parseInt(editText1.getText().toString());
+        int num2 = Integer.parseInt(editText2.getText().toString());
 
+        message = num1 + "*" + num2 + "==";
 
         editText1.setEnabled(false);
         editText2.setEnabled(false);
 
         MyAsyncTask asyncTask = new MyAsyncTask();
-        asyncTask.doInBackground();
+        asyncTask.execute(num1, num2);
     }
 
     public static long multiplyNaturals(int First, int Second) {
@@ -97,20 +100,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private class MyAsyncTask extends AsyncTask<Void, Integer, Long> {
-
-        private int num1;
-        private int num2;
-
-        @Override
-        protected void onPreExecute() {
-            num1 = Integer.parseInt(editText1.getText().toString());
-            num2 = Integer.parseInt(editText2.getText().toString());
-        }
+    private class MyAsyncTask extends AsyncTask<Integer, Integer, Long> {
 
         @Override
         protected void onPostExecute(Long aLong) {
-            String message = num1 + "*" + num2 + "==" +aLong;
+            message += aLong;
             textView.setText(message);
             editText1.setEnabled(true);
             editText2.setEnabled(true);
@@ -123,13 +117,13 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        protected Long doInBackground(Void... params) {
+        protected Long doInBackground(Integer... params) {
             try {
                 for (int i = 0; i < 10; i++) {
                     Thread.sleep(1000);
                     publishProgress((i + 1) * 10);
                 }
-                return multiplyNaturals(num1, num2);
+                return multiplyNaturals(params[0], params[1]);
             } catch (InterruptedException e) {
                 e.printStackTrace();
                 return 0L;
